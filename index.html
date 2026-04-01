@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Ultimate AI Calculator 700+</title>
+<title>Ultimate AI Interactive Calculator</title>
 <style>
-/* ------------------ Neon Base ------------------ */
+/* ------------------ Neon Theme ------------------ */
 body {
   margin:0; padding:0; font-family:Arial,sans-serif;
   background:#01031a; color:#00f0ff; text-align:center;
@@ -24,9 +24,8 @@ input {
 }
 #buttons {margin:10px;}
 #canvasBox {margin:10px auto; width:400px; height:300px; border:2px solid #00f0ff; border-radius:12px;}
-#startScreen {margin-top:100px;}
+#startScreen {margin-top:50px;}
 #result,#steps,#xp {margin:5px; font-weight:bold; text-shadow:0 0 8px #00f0ff;}
-/* Neon Gradient Background for buttons container */
 .topBtns {margin:10px; padding:10px; border-radius:12px;
 background: linear-gradient(90deg, #00f0ff 0%, #ff00ff 100%);
 box-shadow:0 0 20px #00f0ff;}
@@ -41,7 +40,7 @@ box-shadow:0 0 20px #00f0ff;}
 <button id="startBtn">START</button>
 </div>
 
-<div id="app">
+<div id="app" style="display:none;">
 <div class="topBtns">
 <button onclick="setMode('math')">Math</button>
 <button onclick="setMode('physics')">Physics</button>
@@ -58,74 +57,101 @@ box-shadow:0 0 20px #00f0ff;}
 <p id="result"></p>
 <p id="steps"></p>
 <p id="xp">XP: 0 | Level: 1</p>
+<p id="madeBy">Made by Ali Saif Ali Mustafa Ahmed Shaheed Amir Ghaith Shawqi, with the assistance of Mustafa Ahmed Khurshid, First Grade A</p>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
+// ------------------------- Variables -------------------------
 let mode="",xp=0,level=1;
 document.getElementById("startBtn").onclick=function(){
 document.getElementById("startScreen").style.display="none";
 document.getElementById("app").style.display="block";
 }
 
+// ------------------------- Set Mode -------------------------
 function setMode(m){
   mode=m; document.getElementById("buttons").innerHTML="";
   document.getElementById("canvasBox").innerHTML="";
-  if(m==="math"){
-    addBtn("Plus","+"); addBtn("Minus","-"); addBtn("Times","*"); addBtn("Divide","/");
-    addBtn("Percentage","/100"); addBtn("Sin","sin()"); addBtn("Cos","cos()");
-    addBtn("Tan","tan()"); addBtn("Log","log()"); addBtn("Ln","ln()"); addBtn("Abs","abs()");
-  }
-  else if(m==="physics"){
-    addBtn("Force","force"); addBtn("Mass","mass"); addBtn("Acceleration","accel");
-    addBtn("Velocity","vel"); addBtn("Energy","energy"); addBtn("Pressure","pressure");
-    addBtn("Density","density"); addBtn("Kinetic Energy","kinetic");
-    addBtn("Temp","temp"); addBtn("Work","work"); addBtn("Momentum","momentum");
-    addBtn("Power","power"); addBtn("Gravity","gravity"); addBtn("Volume","volume");
-    addBtn("Area","area"); addBtn("Speed","speed");
-  }
-  else if(m==="3d"){
-    addBtn("Cube","cube"); addBtn("Sphere","sphere"); addBtn("Cylinder","cylinder");
-    addBtn("Cone","cone"); addBtn("Pyramid","pyramid"); addBtn("Triangular Prism","triPrism");
-  }
-  else if(m==="atoms"){
-    addBtn("Solid","solid"); addBtn("Liquid","liquid"); addBtn("Gas","gas"); addBtn("Plasma","plasma");
-  }
-  else if(m==="puzzle"){
-    addBtn("Puzzle 1","puzzle1"); addBtn("Puzzle 2","puzzle2"); addBtn("Puzzle 3","puzzle3"); addBtn("Puzzle 4","puzzle4");
-  }
+  if(m==="math"){ addMathBtns(); }
+  else if(m==="physics"){ addPhysicsBtns(); }
+  else if(m==="3d"){ add3DBtns(); }
+  else if(m==="atoms"){ addAtomsBtns(); }
+  else if(m==="puzzle"){ addPuzzleBtns(); }
 }
 
-function addBtn(name,value){
-  let b=document.createElement("button");
-  b.innerText=name;
-  b.onclick=function(){document.getElementById("input").value=value; if(mode==="3d") draw3D(value);}
-  document.getElementById("buttons").appendChild(b);
+// ------------------------- Add Buttons -------------------------
+function addBtn(name,value){ 
+  let b=document.createElement("button"); b.innerText=name; 
+  b.onclick=function(){document.getElementById("input").value=value; if(mode==="3d") draw3D(value);} 
+  document.getElementById("buttons").appendChild(b); 
 }
 
+// ------------------------- Math Buttons -------------------------
+function addMathBtns(){
+let ops=["Plus","+","Minus","-","Times","*","Divide","/","Percentage","/100",
+"Sin","sin()","Cos","cos()","Tan","tan()","Log","log()","Ln","ln()","Abs","abs()"];
+for(let i=0;i<ops.length;i+=2){ addBtn(ops[i],ops[i+1]); }
+}
+
+// ------------------------- Physics Buttons -------------------------
+function addPhysicsBtns(){
+let phys=["Force","force","Mass","mass","Acceleration","accel","Velocity","vel","Energy","energy",
+"Pressure","pressure","Density","density","Kinetic Energy","kinetic","Temp","temp","Work","work",
+"Momentum","momentum","Power","power","Gravity","gravity","Volume","volume","Area","area","Speed","speed"];
+for(let i=0;i<phys.length;i+=2){ addBtn(phys[i],phys[i+1]); }
+}
+
+// ------------------------- 3D Buttons -------------------------
+function add3DBtns(){
+let shapes=["Cube","cube","Sphere","sphere","Cylinder","cylinder","Cone","cone","Pyramid","pyramid","Triangular Prism","triPrism"];
+for(let i=0;i<shapes.length;i+=2){ addBtn(shapes[i],shapes[i+1]); }
+}
+
+// ------------------------- Atoms Buttons -------------------------
+function addAtomsBtns(){ addBtn("Solid","solid"); addBtn("Liquid","liquid"); addBtn("Gas","gas"); addBtn("Plasma","plasma"); }
+
+// ------------------------- Puzzle Buttons -------------------------
+function addPuzzleBtns(){ addBtn("Puzzle 1","puzzle1"); addBtn("Puzzle 2","puzzle2"); addBtn("Puzzle 3","puzzle3"); addBtn("Puzzle 4","puzzle4"); }
+
+// ------------------------- Calculate -------------------------
 function calculate(){
   let input=document.getElementById("input").value;
   let result="",stepsTxt="";
   try{
-    if(mode==="math"){
-      let val=eval(input.replace("sin","Math.sin").replace("cos","Math.cos").replace("tan","Math.tan")
-      .replace("log","Math.log10").replace("ln","Math.log").replace("abs","Math.abs"));
+    if(mode==="math"){ 
+      let val=eval(input.replace("sin","Math.sin").replace("cos","Math.cos")
+      .replace("tan","Math.tan").replace("log","Math.log10").replace("ln","Math.log")
+      .replace("abs","Math.abs")); 
       result=val; stepsTxt=input+" → "+val; xp+=10;
     }
-    else if(mode==="physics"){
-      if(input.includes("force")){
-        let f=10,m=5; let a=f/m; result="Acceleration="+a; stepsTxt="acceleration=force/mass"; xp+=10;
-      } else result="Physics result"; xp+=5;
-    }
-    else result="Use buttons for 3D, Atoms, or Puzzle"; xp+=2;
-  }catch(e){result="Error";}
+    else if(mode==="physics"){ result=physicsCalc(input); xp+=10;}
+    else if(mode==="3d"){ result="Use the 3D input fields to resize"; xp+=2;}
+    else if(mode==="atoms"){ result="Atoms simulation active"; xp+=2;}
+    else if(mode==="puzzle"){ result=puzzleCheck(input); xp+=20;}
+  }catch(e){result="Error"; stepsTxt="";}
   document.getElementById("result").innerText=result;
   document.getElementById("steps").innerText=stepsTxt;
   updateXP();
 }
 
-function updateXP(){if(xp>=level*100){level++; xp=0;} document.getElementById("xp").innerText="XP: "+xp+" | Level: "+level;}
+// ------------------------- XP System -------------------------
+function updateXP(){ if(xp>=level*100){level++; xp=0;} document.getElementById("xp").innerText="XP: "+xp+" | Level: "+level; }
 
+// ------------------------- Physics Calculations -------------------------
+function physicsCalc(input){
+  if(input.includes("force")){ let f=10,m=5; let a=f/m; return "Acceleration="+a;}
+  else if(input.includes("mass")){ return "Mass=5 kg";}
+  else if(input.includes("pressure")){ return "Pressure=101 kPa";}
+  else if(input.includes("energy")){ return "Energy=50 J";}
+  else if(input.includes("velocity")){ return "Velocity=10 m/s";}
+  else return "Physics result";
+}
+
+// ------------------------- Puzzle -------------------------
+function puzzleCheck(input){ return "Puzzle checked!"; }
+
+// ------------------------- 3D Shapes -------------------------
 function draw3D(shape){
   document.getElementById("canvasBox").innerHTML="";
   let width=400,height=300;
@@ -141,7 +167,7 @@ function draw3D(shape){
   else if(shape==="pyramid") geometry=new THREE.ConeGeometry(1,2,4);
   else if(shape==="triPrism") geometry=new THREE.CylinderGeometry(1,1,2,3);
   let mesh=new THREE.Mesh(geometry,material); scene.add(mesh); camera.position.z=5;
-  function animate(){requestAnimationFrame(animate); mesh.rotation.x+=0.01; mesh.rotation.y+=0.01; renderer.render(scene,camera);}
+  function animate(){ requestAnimationFrame(animate); mesh.rotation.x+=0.01; mesh.rotation.y+=0.01; renderer.render(scene,camera);}
   animate();
 }
 </script>
