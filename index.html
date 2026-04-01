@@ -1,0 +1,181 @@
+here<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ultimate AI Calculator</title>
+<style>
+/* ====================== Neon UI ====================== */
+body{background:#01031a;color:#00f0ff;font-family:Arial,sans-serif;text-align:center;margin:0;padding:0;}
+button{background:#01031a;color:#00f0ff;border:2px solid #00f0ff;border-radius:10px;padding:10px 20px;margin:5px;cursor:pointer;transition:0.3s;font-weight:bold;}
+button:hover{background:#00f0ff;color:#01031a;box-shadow:0 0 20px #00f0ff;}
+input{margin:10px;padding:10px;border-radius:8px;border:2px solid #00f0ff;background:#01031a;color:#00f0ff;width:80%;max-width:400px;}
+canvas{border:2px solid #00f0ff;margin-top:10px;}
+#startScreen{position:fixed;width:100%;height:100%;display:flex;justify-content:center;align-items:center;flex-direction:column;background:#000;}
+#app{display:none;padding:20px;}
+.topBtns{margin:10px;}
+#buttons{margin:10px;}
+#canvasBox{margin:10px;}
+#xp{margin:10px;font-weight:bold;font-size:1.2em;}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+<div id="startScreen">
+<h1>☢️ Ultimate AI Calculator</h1>
+<p>Experience next-level interactive calculations!</p>
+<button id="startBtn">START</button>
+</div>
+
+<div id="app">
+<div class="topBtns">
+<button onclick="setMode('math')">Math</button>
+<button onclick="setMode('physics')">Physics</button>
+<button onclick="setMode('3d')">3D Shapes</button>
+<button onclick="setMode('atoms')">Atoms</button>
+<button onclick="setMode('puzzle')">Puzzle</button>
+<button onclick="setMode('graph')">Graph</button>
+</div>
+
+<input id="input" placeholder="Type math, physics, or puzzle…">
+<div id="buttons"></div>
+<div id="canvasBox"></div>
+<canvas id="graphCanvas" width="400" height="250"></canvas>
+<button onclick="calculate()">Calculate</button>
+
+<p id="result"></p>
+<p id="steps"></p>
+<p id="xp">XP: 0 | Level: 1</p>
+</div>
+
+<script>
+let mode="math";
+let xp=0, level=1;
+
+const app=document.getElementById("app");
+const startBtn=document.getElementById("startBtn");
+const input=document.getElementById("input");
+const result=document.getElementById("result");
+const steps=document.getElementById("steps");
+const canvasBox=document.getElementById("canvasBox");
+const graphCanvas=document.getElementById("graphCanvas");
+
+startBtn.onclick=()=>{
+document.getElementById("startScreen").style.display="none";
+app.style.display="block";
+alert("Welcome to Ultimate AI Calculator! 🚀\nSolve puzzles, physics, math, and explore atoms and 3D shapes!");
+}
+
+function setMode(m){
+mode=m;
+canvasBox.innerHTML="";
+steps.innerHTML="";
+result.innerText="";
+input.value="";
+document.getElementById("buttons").innerHTML="";
+if(m==="3d") setup3D();
+if(m==="atoms") setupAtoms();
+if(m==="puzzle") setupPuzzle();
+}
+
+function updateXP(amount=10){
+xp+=amount;
+if(xp>=level*50) level++;
+document.getElementById("xp").innerText=`XP: ${xp} | Level: ${level}`;
+}
+
+function calculate(){
+let val=input.value.toLowerCase();
+steps.innerHTML="";
+try{
+val=val.replace(/×/g,"*").replace(/÷/g,"/");
+let res=Function("return "+val)();
+result.innerText=res;
+steps.innerHTML=`<b>Step:</b> ${val} → ${res}`;
+updateXP(5);
+}catch{
+result.innerText="Error: cannot compute";
+}
+}
+
+graphCanvas.onclick=()=>{
+if(!input.value) return;
+let ctx=graphCanvas.getContext("2d");
+ctx.clearRect(0,0,400,250);
+for(let x=-10;x<10;x+=0.1){
+let y=eval(input.value.replace(/x/g,x));
+let px=(x+10)*20;
+let py=125-y*10;
+ctx.fillRect(px,py,2,2);
+}
+updateXP(5);
+}
+
+function setup3D(){
+canvasBox.innerHTML="";
+let size=parseFloat(prompt("Enter size of cube:"))||1;
+let scene=new THREE.Scene();
+let camera=new THREE.PerspectiveCamera(75,1,0.1,1000);
+let renderer=new THREE.WebGLRenderer();
+renderer.setSize(300,200);
+canvasBox.appendChild(renderer.domElement);
+let geo=new THREE.BoxGeometry(size,size,size);
+let mesh=new THREE.Mesh(geo,new THREE.MeshNormalMaterial());
+scene.add(mesh);
+camera.position.z=5;
+let mouseX=0, mouseY=0;
+renderer.domElement.onmousemove=(e)=>{
+mouseX=e.clientX/100;
+mouseY=e.clientY/100;
+}
+function animate(){
+requestAnimationFrame(animate);
+mesh.rotation.x+=0.01+mouseY;
+mesh.rotation.y+=0.01+mouseX;
+renderer.render(scene,camera);
+}
+animate();
+}
+
+function setupAtoms(){
+canvasBox.innerHTML="";
+let canvas=document.createElement("canvas");
+canvas.width=300; canvas.height=200;
+canvasBox.appendChild(canvas);
+let ctx=canvas.getContext("2d");
+let atoms=[];
+for(let i=0;i<50;i++) atoms.push({x:Math.random()*300, y:Math.random()*200});
+function animate(){
+ctx.clearRect(0,0,300,200);
+atoms.forEach(a=>{
+a.x+=Math.random()*4-2;
+a.y+=Math.random()*4-2;
+ctx.fillStyle="#00f0ff";
+ctx.fillRect(a.x,a.y,3,3);
+});
+requestAnimationFrame(animate);
+}
+animate();
+}
+
+function setupPuzzle(){
+canvasBox.innerHTML="";
+let a=Math.floor(Math.random()*20);
+let b=Math.floor(Math.random()*20);
+let ans=a+b;
+let options=[ans, ans+1, ans-1, ans+2];
+options.sort(()=>Math.random()-0.5);
+options.forEach(o=>{
+let btn=document.createElement("button");
+btn.innerText=o;
+btn.onclick=()=>{
+if(o===ans){result.innerText="Correct!";updateXP(10);}
+else result.innerText="Wrong!";
+};
+canvasBox.appendChild(btn);
+});
+}
+</script>
+
+</body>
+</html>
